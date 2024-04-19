@@ -1,0 +1,658 @@
+<!--
+    🚨🚨温馨提示🚨🚨
+    下面代码是程序自动生成，可能存在个别无法运行，如果无法运行，请调整下echarts版本，或者自行浏览器查看报错信息进行修复；
+    下面代码分为 echarts框架代码这个代码主要用于能运行起来echarts，还有就是核心代码（用🚨🚨非常重要🚨🚨进行标注了），核心代码主要用于显示案例效果
+    如果有问题请打开社区网站 https://www.makeapie.cn 添加右上角微信群/qq群进行询问
+     
+    🚨🚨Tips🚨🚨：
+    不要项目中使用社区链接资源，如https://www.makeapie.cn/dep/echarts/map/js/china.js，请务必下载本地后使用，因为社区地址会不定期更换，可能会导致你们项目出现问题。
+-->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>www.makeApie.cn - ECharts案例下载 - 地图下钻</title>
+    <!--
+        🚨🚨非常重要🚨🚨：设置相对路径资源url链接
+        如果你需要本地使用，请下载下来，假设下面代码中有个相对路径资源 /dep/echarts/map/js/china.js，👉👉下载方法：https://www.makeapie.cn/dep/echarts/map/js/china.js
+    -->
+    <base href="https://www.makeapie.cn/">
+
+    <!-- 引入刚刚下载的 ECharts 文件 和 jquery -->
+    <script type="text/javascript"
+        src="https://registry.npmmirror.com/echarts/4.1.0/files/dist/echarts.min.js"></script>
+    <script type="text/javascript" src="https://registry.npmmirror.com/jquery/3.7.1/files/dist/jquery.min.js"></script>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+
+    <!--
+        🚨🚨非常重要🚨🚨：下面是运行案例需要的第三方脚本，如果是相对链接，下载方法看上面👆👆
+        如果你需要本地使用，请下载下来，假设下面代码中有个相对路径资源 /dep/echarts/map/js/china.js，下载方法：https://www.makeapie.cn/dep/echarts/map/js/china.js
+    -->
+    <!--暂无第三方脚本-->
+
+</head>
+
+<body>
+    <!-- 为 ECharts 准备一个定义了宽高的 DOM -->
+    <div id="chart-panel"
+        style="width: calc(100vw - 200px);height:calc(100vh - 200px); padding: 100px; margin: 0 auto;"></div>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('chart-panel'));
+        // 指定图表的配置项和数据
+        var option = {};
+
+        //=============== start ===============//
+        /**
+         * 🚨🚨非常重要🚨🚨
+         * 下面是 网站左侧代码，核心代码
+         */
+        //  山西省共有十一个地级市，这些地级市分别是太原市、大同市、朔州市、忻州市、阳泉市、吕梁市、晋中市、长治市、晋城市、临汾市和运城市。
+        var jiangxi = "https://geo.datav.aliyun.com/areas_v3/bound/140000_full.json";
+        var datong = "https://geo.datav.aliyun.com/areas_v3/bound/140200_full.json";
+        var yuncheng = "https://geo.datav.aliyun.com/areas_v3/bound/140800_full.json";
+        var shuozhou = "https://geo.datav.aliyun.com/areas_v3/bound/140600_full.json";
+        var xinzhou = "https://geo.datav.aliyun.com/areas_v3/bound/140900_full.json";
+        var taiyuan = "https://geo.datav.aliyun.com/areas_v3/bound/140100_full.json";
+        var yangquan = "https://geo.datav.aliyun.com/areas_v3/bound/140300_full.json";
+        var lvliang = "https://geo.datav.aliyun.com/areas_v3/bound/141100_full.json";
+        var jinzhong = "https://geo.datav.aliyun.com/areas_v3/bound/140700_full.json";
+        var changzhi = "https://geo.datav.aliyun.com/areas_v3/bound/140400_full.json";
+        var linfen = "https://geo.datav.aliyun.com/areas_v3/bound/141000_full.json";
+        var jincheng = "https://geo.datav.aliyun.com/areas_v3/bound/140500_full.json";
+
+        echarts.extendsMap = function (id, opt) {
+            // 实例
+            var chart = this.init(document.getElementById(id));
+
+            var curGeoJson = {};
+            var cityMap = {
+                "大同市": datong,
+                "朔州市": shuozhou,
+                "忻州市": xinzhou,
+                "太原市": taiyuan,
+                "阳泉市": yangquan,
+                "吕梁市": lvliang,
+                "晋中市": jinzhong,
+                "长治市": changzhi,
+                "临汾市": linfen,
+                "晋城市": jincheng,
+                "运城市": yuncheng,
+
+            };
+            //             山西省各市经纬度查询
+            // .中阳.北纬37.37.东经112.17
+            // 太原 北纬37.54 东经112.33
+            // 长治 北纬36.11 东经113.06
+            // 大同 北纬40.06 东经113.17
+            // 高平 北纬35.48 东经112.55
+            // 古交 北纬37.54 东经112.09
+            // 河津 北纬35.35 东经110.41
+            // 侯马北纬35.37东经111.21
+            // 霍州北纬36.34 东经111.42
+            // 介休 北纬37.02 东经111.55
+            // 晋城 北纬35.30 东经112.51
+            // 临汾 北纬36.05 东经111.31
+            // 潞城 北纬36.21 东经113.14
+            // 朔州 北纬39.19 东经112.26
+            // 孝义北纬37.08东经111.48
+            // 忻州 北纬38.24 东经112.43
+            // 阳泉 北纬37.51 东经113.34
+            // 永济北纬34.52 东经110.27
+            // 原平 北纬38.43 东经112.42
+            // 榆次 北纬37.41 东经112.43
+            // 运城 北纬35.02 东经110.59
+            var geoCoordMap = {
+                "大同市": [113.17, 40.06],
+                "朔州市": [112.26, 39.19],
+                "忻州市": [112.43, 38.24],
+                "太原市": [112.33, 37.54],
+                "阳泉市": [113.34, 37.51],
+                "吕梁市": [111.13, 37.52],
+                "晋中市": [112.75, 37.68],
+                "长治市": [113.06, 36.11],
+                "临汾市": [111.31, 36.05],
+                "晋城市": [112.51, 35.30],
+                "运城市": [110.59, 35.02],
+            };
+            var levelColorMap = {
+                '1': 'rgba(241, 109, 115, .8)',
+                '2': 'rgba(255, 235, 59, .7)',
+                '3': 'rgba(147, 235, 248, 1)'
+            };
+            var points = [{
+                name: '矿点A',
+                value: [113.17, 40.07]
+            }, {
+                name: '矿点B',
+                value: [110.59, 35.04]
+            }, {
+                name: '矿点C',
+                value: [111.843177, 37.376834]
+            }]
+            var defaultOpt = {
+                mapName: 'china',     // 地图展示
+                goDown: false,        // 是否下钻
+                bgColor: '#404a59',   // 画布背景色
+                activeArea: [],       // 区域高亮,同echarts配置项
+                data: [],
+                // 下钻回调(点击的地图名、实例对象option、实例对象)
+                callback: function (name, option, instance) { }
+            };
+            if (opt) opt = this.util.extend(defaultOpt, opt);
+
+            // 层级索引
+            var name = [opt.mapName];
+            var idx = 0;
+            var pos = {
+                leftPlus: 115,
+                leftCur: 150,
+                left: 198,
+                top: 50
+            };
+
+            var line = [[0, 0], [8, 11], [0, 22]];
+            // style
+            var style = {
+                font: '18px "Microsoft YaHei", sans-serif',
+                textColor: '#eee',
+                lineColor: 'rgba(147, 235, 248, .8)'
+            };
+            var planePath = 'path://M482.304 439.808L423.936 237.056h-153.6v37.376h103.936l48.128 164.864h-0.512l18.432 61.44h516.096V443.904l-474.112-4.096zM358.912 295.936H213.504l-144.896 271.36h-0.512V737.28h64v-5.12c-0.512-69.632 57.344-127.488 129.024-128.512 71.68 1.024 129.536 58.368 129.024 128.512 0 2.048 41.984 3.072 12.8 3.072h262.144c0-2.048 7.168-1.536 7.168-3.072-0.512-69.632 57.344-127.488 129.024-128.512 16.896 0 33.792 3.072 49.152 9.728l73.728 32.256h31.744v-129.024h-537.6L358.912 295.936z m-203.776 240.128L245.76 364.544h59.904l38.912 172.032-189.44-0.512z m645.632 91.136c-57.856 0-104.96 46.592-104.96 104.448s47.104 104.448 104.96 104.448 104.96-46.592 104.96-104.448-47.104-104.448-104.96-104.448z m-540.16 0c-57.856 0-104.96 46.592-104.96 104.448s47.104 104.448 104.96 104.448 104.96-46.592 104.96-104.448-47.104-104.448-104.96-104.448z m687.104-214.528L906.24 306.176l-33.792-23.552-38.912 17.92-45.568-112.64-78.336 33.792-83.968 8.192-43.008 71.168-48.128-17.92-38.912 88.064-6.656 7.68 18.944 33.792h439.808z'
+            var handleEvents = {
+                /**
+                 * i 实例对象
+                 * o option
+                 * n 地图名
+                **/
+                resetOption: function (i, o, n) {
+                    var breadcrumb = this.createBreadcrumb(n);
+
+                    var j = name.indexOf(n);
+                    var l = o.graphic.length;
+                    if (j < 0) {
+                        o.graphic.push(breadcrumb);
+                        o.graphic[0].children[0].shape.x2 = 145;
+                        o.graphic[0].children[1].shape.x2 = 145;
+                        if (o.graphic.length > 2) {
+                            for (var x = 0; x < opt.data.length; x++) {
+                                if (n === opt.data[x].name + '市') {
+                                    o.series[0].data = handleEvents.initSeriesData([opt.data[x]]);
+                                    break;
+                                } else o.series[0].data = [];
+                            }
+                        };
+                        name.push(n);
+                        idx++;
+                    } else {
+                        o.graphic.splice(j + 2, l);
+                        if (o.graphic.length <= 2) {
+                            o.graphic[0].children[0].shape.x2 = 60;
+                            o.graphic[0].children[1].shape.x2 = 60;
+                            o.series[0].data = handleEvents.initSeriesData(opt.data);
+                        };
+                        name.splice(j + 1, l);
+                        idx = j;
+                        pos.leftCur -= pos.leftPlus * (l - j - 1);
+                    };
+
+                    o.geo.map = n;
+                    o.geo.zoom = 0.4;
+                    i.clear();
+                    i.setOption(o);
+                    this.zoomAnimation();
+                    opt.callback(n, o, i);
+                },
+
+                /**
+                 * name 地图名
+                **/
+                createBreadcrumb: function (name) {
+                    var cityToPinyin = {
+                        "大同市": 'datong',
+                        "朔州市": 'shuozhou',
+                        "忻州市": 'xinzhou',
+                        "太原市": 'taiyuan',
+                        "阳泉市": 'yangquan',
+                        "吕梁市": 'lvliang',
+                        "晋中市": 'jinzhong',
+                        "长治市": 'changzhi',
+                        "临汾市": 'linfen',
+                        "晋城市": 'jincheng',
+                        "运城市": 'yuncheng',
+
+
+                    };
+                    var breadcrumb = {
+                        type: 'group',
+                        id: name,
+                        left: pos.leftCur + pos.leftPlus,
+                        top: pos.top + 3,
+                        children: [{
+                            type: 'polyline',
+                            left: -90,
+                            top: -5,
+                            shape: {
+                                points: line
+                            },
+                            style: {
+                                stroke: '#fff',
+                                key: name
+                                // lineWidth: 2,
+                            },
+                            onclick: function () {
+                                var name = this.style.key;
+                                handleEvents.resetOption(chart, option, name);
+                            }
+                        }, {
+                            type: 'text',
+                            left: -68,
+                            top: 'middle',
+                            style: {
+                                text: name,
+                                textAlign: 'center',
+                                fill: style.textColor,
+                                font: style.font
+                            },
+                            onclick: function () {
+                                var name = this.style.text;
+                                handleEvents.resetOption(chart, option, name);
+                            }
+                        }, {
+                            type: 'text',
+                            left: -68,
+                            top: 10,
+                            style: {
+
+                                name: name,
+                                text: cityToPinyin[name] ? cityToPinyin[name].toUpperCase() : '',
+                                textAlign: 'center',
+                                fill: style.textColor,
+                                font: '12px "Microsoft YaHei", sans-serif',
+                            },
+                            onclick: function () {
+                                // console.log(this.style);
+                                var name = this.style.name;
+                                handleEvents.resetOption(chart, option, name);
+                            }
+                        }]
+                    }
+
+                    pos.leftCur += pos.leftPlus;
+
+                    return breadcrumb;
+                },
+
+                // 设置effectscatter
+                initSeriesData: function (data) {
+                    var temp = [];
+                    for (var i = 0; i < data.length; i++) {
+                        var geoCoord = geoCoordMap[data[i].name];
+                        if (geoCoord) {
+                            temp.push({
+                                name: data[i].name,
+                                value: geoCoord.concat(data[i].value, data[i].level)
+                            });
+                        }
+                    };
+                    return temp;
+                },
+
+                zoomAnimation: function () {
+                    var count = null;
+                    var zoom = function (per) {
+                        if (!count) count = per;
+                        count = count + per;
+                        // console.log(per,count);
+                        chart.setOption({
+                            geo: {
+                                zoom: count
+                            }
+                        });
+                        if (count < 1) window.requestAnimationFrame(function () {
+                            zoom(0.2);
+                        });
+                    };
+                    window.requestAnimationFrame(function () {
+                        zoom(0.2);
+                    });
+                }
+            };
+
+            var option = {
+                backgroundColor: opt.bgColor,
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(12, 204, 104, 0.92)',
+                    borderColor: '#FFFFCC',
+                    showDelay: 0,
+                    hideDelay: 0,
+                    enterable: true,
+                    transitionDuration: 0,
+                    extraCssText: 'z-index:100',
+                    formatter: function (params, ticket, callback) {
+                        //根据业务自己拓展要显示的内容
+                        var res = "";
+                        var name = params.name;
+                        var value = params.value;
+                        res = "<span style='color:#fff;'>" + name + "</span><br/>数据：" + value;
+                        return res;
+                    }
+                },
+                graphic: [{
+                    type: 'group',
+                    left: pos.left,
+                    top: pos.top - 4,
+                    children: [{
+                        type: 'line',
+                        left: 0,
+                        top: -20,
+                        shape: {
+                            x1: 0,
+                            y1: 0,
+                            x2: 60,
+                            y2: 0
+                        },
+                        style: {
+                            stroke: style.lineColor,
+                        }
+                    }, {
+                        type: 'line',
+                        left: 0,
+                        top: 20,
+                        shape: {
+                            x1: 0,
+                            y1: 0,
+                            x2: 60,
+                            y2: 0
+                        },
+                        style: {
+                            stroke: style.lineColor,
+                        }
+                    }]
+                }, {
+                    id: name[idx],
+                    type: 'group',
+                    left: pos.left + 2,
+                    top: pos.top,
+                    children: [{
+                        type: 'polyline',
+                        left: 90,
+                        top: -12,
+                        shape: {
+                            points: line
+                        },
+                        style: {
+                            stroke: 'transparent',
+                            key: name[0]
+                        },
+                        onclick: function () {
+                            var name = this.style.key;
+                            handleEvents.resetOption(chart, option, name);
+                        }
+                    }, {
+                        type: 'text',
+                        left: 0,
+                        top: 'middle',
+                        style: {
+                            text: name[0] === '山西' ? '山西省' : name[0],
+                            textAlign: 'center',
+                            fill: style.textColor,
+                            font: style.font
+                        },
+                        onclick: function () {
+                            handleEvents.resetOption(chart, option, '山西');
+                        }
+                    }, {
+                        type: 'text',
+                        left: 0,
+                        top: 10,
+                        style: {
+                            text: 'SHANXI',
+                            textAlign: 'center',
+                            fill: style.textColor,
+                            font: '12px "Microsoft YaHei", sans-serif',
+                        },
+                        onclick: function () {
+                            handleEvents.resetOption(chart, option, '山西');
+                        }
+                    }]
+                }],
+                geo: {
+                    map: opt.mapName,
+                    // roam: true,
+                    zoom: 1,
+                    label: {
+                        normal: {
+                            show: true,
+                            textStyle: {
+                                color: '#fff'
+                            }
+                        },
+                        emphasis: {
+                            textStyle: {
+                                color: '#fff'
+                            }
+                        }
+                    },
+                    itemStyle: {
+                        normal: {
+                            borderColor: 'rgba(147, 235, 248, 1)',
+                            borderWidth: 1,
+                            areaColor: {
+                                type: 'radial',
+                                x: 0.5,
+                                y: 0.5,
+                                r: 0.8,
+                                colorStops: [{
+                                    offset: 0,
+                                    color: 'rgba(147, 235, 248, 0)' // 0% 处的颜色
+                                }, {
+                                    offset: 1,
+                                    color: 'rgba(147, 235, 248, .2)' // 100% 处的颜色
+                                }],
+                                globalCoord: false // 缺省为 false
+                            },
+                            shadowColor: 'rgba(128, 217, 248, 1)',
+                            // shadowColor: 'rgba(255, 255, 255, 1)',
+                            shadowOffsetX: -2,
+                            shadowOffsetY: 2,
+                            shadowBlur: 10
+                        },
+                        emphasis: {
+                            areaColor: '#389BB7',
+                            borderWidth: 0
+                        }
+                    },
+                    regions: opt.activeArea.map(function (item) {
+                        if (typeof item !== 'string') {
+                            return {
+                                name: item.name,
+                                itemStyle: {
+                                    normal: {
+                                        areaColor: item.areaColor || '#389BB7'
+                                    }
+                                },
+                                label: {
+                                    normal: {
+                                        show: item.showLabel,
+                                        textStyle: {
+                                            color: '#fff'
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            return {
+                                name: item,
+                                itemStyle: {
+                                    normal: {
+                                        borderColor: '#91e6ff',
+                                        areaColor: '#389BB7'
+                                    }
+                                }
+                            }
+                        }
+                    })
+                },
+                series: [{
+                    type: 'effectScatter',
+                    coordinateSystem: 'geo',
+                    // symbol: 'diamond',
+                    showEffectOn: 'render',
+                    rippleEffect: {
+                        period: 15,
+                        scale: 4,
+                        brushType: 'fill'
+                    },
+                    hoverAnimation: true,
+                    itemStyle: {
+                        normal: {
+                            color: function (params) {
+                                return levelColorMap[params.value[3]];
+                            },
+                            shadowBlur: 10,
+                            shadowColor: '#333'
+                        }
+                    },
+                    label: {
+                        normal: {
+                            formatter: '{b}',
+                            position: 'right',
+                            offset: [15, 0],
+                            color: '#1DE9B6',
+                            show: true
+                        },
+                    },
+                    data: points
+                },
+                {
+                    type: 'lines',
+                    zlevel: 2,
+                    effect: {
+                        show: true,
+                        period: 10, //箭头指向速度，值越小速度越快
+                        trailLength: 0, //特效尾迹长度[0,1]值越大，尾迹越长重
+                        symbol: planePath,
+                        symbolSize: 15, //图标大小
+                    },
+                    lineStyle: {
+                        normal: {
+                            color: '#1DE9B6',
+                            width: 0.5, //线条宽度
+                            opacity: 0.5, //尾迹线条透明度
+                            curveness: .3 //尾迹线条曲直度
+                        }
+                    },
+                    data: [{
+                        coords: [
+                            [113.17, 40.07],
+                            [110.59, 35.04]
+                        ]
+                    }, {
+                        coords: [
+                            [111.843177, 37.376834],
+                            [113.17, 40.07]
+                        ]
+                    }]
+                },]
+            };
+
+            chart.setOption(option);
+            // 添加事件
+            chart.on('click', function (params) {
+                var _self = this;
+                if (opt.goDown && params.name !== name[idx]) {
+                    if (cityMap[params.name]) {
+                        var url = cityMap[params.name];
+                        $.get(url, function (response) {
+                            // console.log(response);
+                            curGeoJson = response;
+                            echarts.registerMap(params.name, response);
+                            handleEvents.resetOption(_self, option, params.name);
+                        });
+                    }
+                }
+            });
+
+            chart.setMap = function (mapName) {
+                var _self = this;
+                if (mapName.indexOf('市') < 0) mapName = mapName + '市';
+                var citySource = cityMap[mapName];
+                if (citySource) {
+                    var url = './map/' + citySource + '.json';
+                    $.get(url, function (response) {
+                        // console.log(response);
+                        curGeoJson = response;
+                        echarts.registerMap(mapName, response);
+                        handleEvents.resetOption(_self, option, mapName);
+                    });
+                }
+                // handleEvents.resetOption(this, option, mapName);
+            };
+
+            return chart;
+        };
+
+        $.getJSON(jiangxi, function (geoJson) {
+            echarts.registerMap('山西', geoJson);
+            var myChart = echarts.extendsMap('chart-panel', {
+                bgColor: '#154e90', // 画布背景色
+                mapName: '山西',    // 地图名
+                goDown: true,       // 是否下钻
+                // 下钻回调
+                callback: function (name, option, instance) {
+                    console.log(name, option, instance);
+                    // points = [{
+                    //     name: '矿点A',
+                    //     value: [113.17, 40.07]
+                    // }, {
+                    //     name: '矿点B',
+                    //     value: [113.19, 40.04]
+                    // }, {
+                    //     name: '矿点C',
+                    //     value: [113.18, 40.09]
+                    // }]
+                    // instance.resize()
+                    option.series[0].data = [{
+                        name: '矿点A',
+                        value: [113.60, 40.04]
+                    }, {
+                        name: '矿点B',
+                        value: [113.19, 40.04]
+                    }, {
+                        name: '矿点C',
+                        value: [113.18, 40.09]
+                    }]
+                    instance.resize()
+                },
+                // 数据展示            	
+                data: [{
+                    name: '运城市',
+                    value: 10,
+                    level: 1
+                }, {
+                    name: '大同市',
+                    value: 12,
+                    level: 2
+                }]
+            });
+        })
+
+        //=============== end ===============//
+
+        // 使用刚指定的配置项和数据显示图表。
+        if (option && typeof option === 'object') {
+            myChart.setOption(option);
+        }
+        window.addEventListener('resize', myChart.resize);
+    </script>
+</body>
+
+</html>
