@@ -603,7 +603,7 @@
         $.getJSON(jiangxi, function (geoJson) {
             echarts.registerMap('山西', geoJson);
             var myChart = echarts.extendsMap('chart-panel', {
-                bgColor: '#154e90', // 画布背景色
+                bgColor: '#00000000', // 画布背景色
                 mapName: '山西',    // 地图名
                 goDown: true,       // 是否下钻
                 // 下钻回调
